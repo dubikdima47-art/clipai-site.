@@ -31,6 +31,12 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <div class="urlrow"><input id="url" type="url" placeholder="Встав посилання для перевірки" autocomplete="url"><button id="inspect">Перевірити відео</button></div>
 <div class="settings"><div><label for="count">Кількість кліпів</label><select id="count"><option>10</option><option>5</option><option>15</option><option>20</option></select></div><div><label for="duration">Тривалість кліпу</label><select id="duration"><option value="45">45 секунд</option><option value="30">30 секунд</option><option value="60">60 секунд</option></select></div></div>
 <div class="result" id="result" aria-live="polite"></div>
+<div class="hint" style="padding:14px;border:1px solid #34415b;border-radius:12px;background:#0b1220">
+<strong style="color:#f5f7fb">Як зробити нарізку з YouTube:</strong><br>
+Посилання YouTube дозволяє ClipAI знайти відео та показати його дані, але YouTube не передає сайту сам відеофайл для монтажу. Якщо це твоє відео або маєш дозвіл на його обробку, завантаж оригінал через
+<a href="https://studio.youtube.com/" target="_blank" rel="noopener noreferrer" style="color:#29d3c2;font-weight:700">YouTube Studio</a>,
+а потім вибери його нижче. Саме так ClipAI зможе створити MP4-кліпи.
+</div>
 <div class="uploadbox">
 <label for="videoFile">Або завантаж відеофайл для створення кліпів</label>
 <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo">
