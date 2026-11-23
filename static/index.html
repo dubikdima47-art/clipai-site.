@@ -29,7 +29,9 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <div class="panel">
 <label for="url">Посилання на YouTube або Google Drive</label>
 <div class="urlrow"><input id="url" type="url" placeholder="Встав посилання для перевірки" autocomplete="url"><button id="inspect">Перевірити відео</button></div>
-<div class="settings"><div><label for="count">Кількість кліпів</label><select id="count"><option>10</option><option>5</option><option>15</option><option>20</option></select></div><div><label for="duration">Тривалість кліпу</label><select id="duration"><option value="45">45 секунд</option><option value="30">30 секунд</option><option value="60">60 секунд</option></select></div></div>
+<div class="settings"><div><label for="count">Кількість кліпів</label><select id="count"><option>10</option><option>5</option></select></div><div><label for="duration">Тривалість кліпу</label><select id="duration"><option value="45">45 секунд</option><option value="30">30 секунд</option><option value="60">60 секунд</option></select></div></div>
+<button id="youtubeClips" style="width:100%;margin-top:18px">Створити кліпи безпосередньо з YouTube</button>
+<div class="progress" id="youtubeStatus" aria-live="polite"></div>
 <div class="result" id="result" aria-live="polite"></div>
 <div class="hint" style="padding:14px;border:1px solid #34415b;border-radius:12px;background:#0b1220">
 <strong style="color:#f5f7fb">Як зробити нарізку з YouTube:</strong><br>
@@ -51,6 +53,30 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 </main><footer>ClipAI · Рання версія · Завантажуй лише відео, на обробку яких маєш дозвіл.</footer>
 <script>
 const $=id=>document.getElementById(id), result=$("result");
+$("youtubeClips").addEventListener("click",async()=>{
+  const url=$("url").value.trim(),status=$("youtubeStatus"),btn=$("youtubeClips");
+  if(!url){status.textContent="Спочатку встав посилання на YouTube.";return}
+  btn.disabled=true;status.textContent="Надсилаю відео на AI-аналіз…";
+  try{
+    const response=await fetch("/api/youtube/jobs",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url,clips:Number($("count").value),duration:Number($("duration").value)})});
+    const data=await response.json();if(!response.ok)throw Error(data.detail||"Не вдалося почати обробку");
+    status.textContent="AI аналізує відео та створює кліпи…";
+    const poll=async()=>{
+      const r=await fetch("/api/youtube/jobs/"+encodeURIComponent(data.job_id));const j=await r.json();if(!r.ok)throw Error(j.detail||"Помилка перевірки завдання");
+      if(j.status==="error")throw Error(j.error||"Не вдалося обробити відео");
+      if(j.status==="done"){
+        status.textContent="Готово! Створено "+j.clips.length+" кліп(ів).";
+        if(!j.clips.length){status.textContent+=" Сервіс не повернув посилань на експорт.";return}
+        const list=document.createElement("div");list.style.marginTop="12px";
+        j.clips.forEach((clip,i)=>{const row=document.createElement("p");const a=document.createElement("a");a.href=clip.download;a.target="_blank";a.rel="noopener noreferrer";a.textContent=(i+1)+". "+clip.title+" — завантажити MP4";a.style.color="#29d3c2";a.style.fontWeight="700";row.append(a);if(clip.score!==null&&clip.score!==undefined){const score=document.createElement("span");score.textContent=" · оцінка "+clip.score;score.style.color="#9aa8bf";row.append(score)}list.append(row)});
+        status.append(list);return
+      }
+      status.textContent="AI-обробка триває…"+(j.clips_ready?" Уже знайдено кліпів: "+j.clips_ready:"");
+      setTimeout(poll,30000)
+    };await poll()
+  }catch(e){status.textContent=e.message}
+  finally{btn.disabled=false}
+});
 $("inspect").addEventListener("click",async()=>{const url=$("url").value.trim();if(!url){result.style.display="block";result.textContent="Спочатку встав посилання на відео.";return}
 const btn=$("inspect");btn.disabled=true;btn.textContent="Перевіряю…";result.style.display="block";result.textContent="Перевіряю посилання…";
 try{const r=await fetch("/api/inspect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw Error(d.detail||"Помилка перевірки");result.innerHTML="";const title=document.createElement("b");title.textContent=d.title||"Відео знайдено";const author=document.createElement("p");author.textContent="Канал: "+(d.author||"невідомо");result.append(title,author);if(d.thumbnail){const img=document.createElement("img");img.src=d.thumbnail;img.alt="Мініатюра відео";result.append(img)}const state=document.createElement("p");state.className="status";state.textContent="Посилання розпізнано. Для монтажу завантаж відеофайл.";result.append(state)}catch(e){result.textContent=e.message}finally{btn.disabled=false;btn.textContent="Перевірити відео"}});
