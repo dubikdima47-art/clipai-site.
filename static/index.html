@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="uk">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#090d18"><title>ClipAI — AI video clips</title>
+<style>
+:root{color-scheme:dark;--bg:#090d18;--panel:#111827;--line:#263249;--muted:#9aa8bf;--white:#f5f7fb;--accent:#7c5cff;--cyan:#29d3c2}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% -10%,#28205a 0,transparent 38%),var(--bg);color:var(--white);font:15px Inter,system-ui,Arial,sans-serif;min-height:100vh}
+header{height:68px;border-bottom:1px solid #202a3d;display:flex;align-items:center;justify-content:space-between;padding:0 max(20px,calc((100% - 1050px)/2));position:sticky;top:0;background:#090d18eF;backdrop-filter:blur(12px);z-index:2}
+.logo{font-weight:850;font-size:22px;letter-spacing:-1px}.logo span{color:var(--cyan)}nav{display:flex;gap:18px}nav a{color:var(--muted);text-decoration:none;font-size:13px}nav a:hover{color:white}
+main{max-width:980px;margin:auto;padding:64px 20px 80px}.eyebrow{color:var(--cyan);font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase}
+h1{font-size:clamp(36px,7vw,62px);line-height:1.02;letter-spacing:-2.5px;margin:14px 0}h1 span{background:linear-gradient(90deg,#a995ff,#36dfd0);background-clip:text;color:transparent}
+.lead{color:var(--muted);font-size:16px;line-height:1.7;max-width:620px}.panel{margin-top:34px;background:linear-gradient(145deg,#151e30,#101725);border:1px solid var(--line);border-radius:22px;padding:24px;box-shadow:0 24px 70px #0005}
+label{display:block;font-weight:650;margin:0 0 9px}.urlrow{display:flex;gap:10px}.urlrow input{flex:1;min-width:0}
+input,select{width:100%;background:#090f1c;border:1px solid #34415b;border-radius:12px;padding:15px;color:white;font:inherit;outline:none}input:focus,select:focus{border-color:var(--accent)}
+button{border:0;border-radius:12px;padding:14px 20px;background:linear-gradient(110deg,var(--accent),#5d8cff);color:white;font-weight:750;font-size:14px;cursor:pointer}button:disabled{opacity:.55;cursor:wait}
+.settings{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px}.hint{font-size:12px;color:var(--muted);line-height:1.6;margin-top:16px}
+.result{display:none;margin-top:20px;padding:15px;border:1px solid #34415b;border-radius:14px;background:#0b1220}.result img{width:100%;max-width:260px;border-radius:10px;margin-top:12px}.status{color:var(--cyan);font-weight:700}
+section.info{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px}.tile{padding:18px;border:1px solid var(--line);border-radius:16px;background:#101827}.tile b{display:block;margin-bottom:8px}.tile p{margin:0;color:var(--muted);font-size:13px;line-height:1.6}
+footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-align:center;font-size:12px}
+@media(max-width:620px){header{padding:0 16px}nav{gap:10px}nav a{font-size:11px}main{padding-top:44px}.panel{padding:17px}.urlrow{flex-direction:column}.settings,section.info{grid-template-columns:1fr}}
+</style></head>
+<body>
+<header><div class="logo">Clip<span>AI</span></div><nav><a href="#home">Головна</a><a href="#how">Як працює</a><a href="#status">Статус</a></nav></header>
+<main id="home">
+<div class="eyebrow">AI video studio</div><h1>Твоє відео.<br><span>Найкращі моменти.</span></h1>
+<p class="lead">ClipAI — задуманий сервіс для пошуку яскравих моментів і створення коротких вертикальних кліпів для Shorts, Reels і TikTok.</p>
+<div class="panel">
+<label for="url">Посилання на YouTube</label>
+<div class="urlrow"><input id="url" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url"><button id="inspect">Перевірити відео</button></div>
+<div class="settings"><div><label for="count">Кількість кліпів</label><select id="count"><option>10</option><option>5</option><option>15</option><option>20</option></select></div><div><label for="duration">Тривалість кліпу</label><select id="duration"><option value="45">45 секунд</option><option value="30">30 секунд</option><option value="60">60 секунд</option></select></div></div>
+<div class="result" id="result" aria-live="polite"></div>
+<p class="hint">Зараз доступна перевірка посилання та отримання назви відео. Автоматичний AI-монтаж ще не підключений: для нього потрібен дозволений доступ до вихідного відео та окремий обчислювальний сервіс.</p>
+</div>
+<section class="info" id="how"><div class="tile"><b>01 · Аналіз</b><p>Перевірка YouTube-посилання та отримання відкритих метаданих відео.</p></div><div class="tile"><b>02 · Відбір моментів</b><p>Наступний етап — AI-пошук цікавих фрагментів тривалістю 30–60 секунд.</p></div><div class="tile"><b>03 · Експорт</b><p>Запланований формат — вертикальне відео 9:16 у MP4 без автоматичних субтитрів.</p></div></section>
+<section id="status" class="tile" style="margin-top:16px"><b>Статус проєкту</b><p id="projectStatus">Інтерфейс і серверний API підготовлені. Обробка відео та експорт MP4 — ще не реалізовані.</p></section>
+</main><footer>ClipAI · Рання версія · Використовуй лише відео, на обробку яких маєш дозвіл.</footer>
+<script>
+const $=id=>document.getElementById(id), result=$("result");
+$("inspect").addEventListener("click",async()=>{const url=$("url").value.trim();if(!url){result.style.display="block";result.textContent="Спочатку встав посилання на YouTube.";return}
+const btn=$("inspect");btn.disabled=true;btn.textContent="Перевіряю…";result.style.display="block";result.textContent="Отримую дані відео…";
+try{const r=await fetch("/api/inspect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw Error(d.detail||"Помилка перевірки");result.innerHTML="";const title=document.createElement("b");title.textContent=d.title||"Відео знайдено";const author=document.createElement("p");author.textContent="Канал: "+(d.author||"невідомо");const img=document.createElement("img");img.src=d.thumbnail;img.alt="Мініатюра відео";result.append(title,author,img);const state=document.createElement("p");state.className="status";state.textContent="Посилання успішно перевірено";result.append(state)}catch(e){result.textContent=e.message}finally{btn.disabled=false;btn.textContent="Перевірити відео"}});
+</script></body></html>
