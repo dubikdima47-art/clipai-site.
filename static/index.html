@@ -25,7 +25,7 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <header><div class="logo">Clip<span>AI</span></div><nav><a href="#home">Головна</a><a href="#how">Як працює</a><a href="#status">Статус</a></nav></header>
 <main id="home">
 <div class="eyebrow">AI video studio</div><h1>Твоє відео.<br><span>Найкращі моменти.</span></h1>
-<p class="lead">Завантаж власний відеофайл — ClipAI зробить вертикальні кліпи 9:16 у форматі MP4.</p>
+<p class="lead">Встав посилання на YouTube — ClipAI знайде найкращі моменти та створить вертикальні кліпи 9:16 у форматі MP4.</p>
 <div class="panel">
 <label for="url">Посилання на YouTube або Google Drive</label>
 <div class="urlrow"><input id="url" type="url" placeholder="Встав посилання для перевірки" autocomplete="url"><button id="inspect">Перевірити відео</button></div>
@@ -33,12 +33,6 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <button id="youtubeClips" style="width:100%;margin-top:18px">Створити кліпи безпосередньо з YouTube</button>
 <div class="progress" id="youtubeStatus" aria-live="polite"></div>
 <div class="result" id="result" aria-live="polite"></div>
-<div class="hint" style="padding:14px;border:1px solid #34415b;border-radius:12px;background:#0b1220">
-<strong style="color:#f5f7fb">Як зробити нарізку з YouTube:</strong><br>
-Посилання YouTube дозволяє ClipAI знайти відео та показати його дані, але YouTube не передає сайту сам відеофайл для монтажу. Якщо це твоє відео або маєш дозвіл на його обробку, завантаж оригінал через
-<a href="https://studio.youtube.com/" target="_blank" rel="noopener noreferrer" style="color:#29d3c2;font-weight:700">YouTube Studio</a>,
-а потім вибери його нижче. Саме так ClipAI зможе створити MP4-кліпи.
-</div>
 <div class="uploadbox">
 <label for="videoFile">Або завантаж відеофайл для створення кліпів</label>
 <input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/x-matroska,video/webm,video/x-msvideo">
@@ -46,11 +40,11 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <button id="makeClips">Створити вертикальні кліпи</button>
 <div class="progress" id="jobStatus" aria-live="polite"></div>
 </div>
-<p class="hint">Поточна версія рівномірно вирізає фрагменти з усього відео та кадрує їх у 9:16. Вона ще не визначає змістовно найкращі моменти за допомогою AI.</p>
+<p class="hint">Нарізка за YouTube-посиланням використовує AI для пошуку моментів і створення кліпів без субтитрів. Завантаження власного файлу нижче поки працює як окремий базовий режим.</p>
 </div>
 <section class="info" id="how"><div class="tile"><b>01 · Завантаження</b><p>Завантаження твого відеофайлу на сервер ClipAI.</p></div><div class="tile"><b>02 · Монтаж</b><p>Автоматичне вирізання фрагментів і вертикальне кадрування 9:16.</p></div><div class="tile"><b>03 · Експорт</b><p>Готові MP4-кліпи в одному ZIP-архіві.</p></div></section>
-<section id="status" class="tile" style="margin-top:16px"><b>Статус проєкту</b><p id="projectStatus">Перевірка посилань і завантаження файлу. AI-відбір найкращих моментів — наступний етап.</p></section>
-</main><footer>ClipAI · Рання версія · Завантажуй лише відео, на обробку яких маєш дозвіл.</footer>
+<section id="status" class="tile" style="margin-top:16px"><b>Статус проєкту</b><p id="projectStatus">YouTube URL → AI-відбір моментів → вертикальні MP4-кліпи без субтитрів.</p></section>
+</main><footer>ClipAI · Рання версія · ClipAI · YouTube AI clipping · Використовуй відео, на обробку яких маєш дозвіл.</footer>
 <script>
 const $=id=>document.getElementById(id), result=$("result");
 $("youtubeClips").addEventListener("click",async()=>{
