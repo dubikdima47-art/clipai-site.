@@ -26,8 +26,8 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 <div class="eyebrow">AI video studio</div><h1>Твоє відео.<br><span>Найкращі моменти.</span></h1>
 <p class="lead">ClipAI — задуманий сервіс для пошуку яскравих моментів і створення коротких вертикальних кліпів для Shorts, Reels і TikTok.</p>
 <div class="panel">
-<label for="url">Посилання на YouTube</label>
-<div class="urlrow"><input id="url" type="url" placeholder="https://www.youtube.com/watch?v=..." autocomplete="url"><button id="inspect">Перевірити відео</button></div>
+<label for="url">Посилання на YouTube або Google Drive</label>
+<div class="urlrow"><input id="url" type="url" placeholder="Встав посилання на YouTube або Google Drive" autocomplete="url"><button id="inspect">Перевірити відео</button></div>
 <div class="settings"><div><label for="count">Кількість кліпів</label><select id="count"><option>10</option><option>5</option><option>15</option><option>20</option></select></div><div><label for="duration">Тривалість кліпу</label><select id="duration"><option value="45">45 секунд</option><option value="30">30 секунд</option><option value="60">60 секунд</option></select></div></div>
 <div class="result" id="result" aria-live="polite"></div>
 <p class="hint">Зараз доступна перевірка посилання та отримання назви відео. Автоматичний AI-монтаж ще не підключений: для нього потрібен дозволений доступ до вихідного відео та окремий обчислювальний сервіс.</p>
@@ -37,7 +37,7 @@ footer{border-top:1px solid #202a3d;color:var(--muted);padding:24px 20px;text-al
 </main><footer>ClipAI · Рання версія · Використовуй лише відео, на обробку яких маєш дозвіл.</footer>
 <script>
 const $=id=>document.getElementById(id), result=$("result");
-$("inspect").addEventListener("click",async()=>{const url=$("url").value.trim();if(!url){result.style.display="block";result.textContent="Спочатку встав посилання на YouTube.";return}
-const btn=$("inspect");btn.disabled=true;btn.textContent="Перевіряю…";result.style.display="block";result.textContent="Отримую дані відео…";
-try{const r=await fetch("/api/inspect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw Error(d.detail||"Помилка перевірки");result.innerHTML="";const title=document.createElement("b");title.textContent=d.title||"Відео знайдено";const author=document.createElement("p");author.textContent="Канал: "+(d.author||"невідомо");const img=document.createElement("img");img.src=d.thumbnail;img.alt="Мініатюра відео";result.append(title,author,img);const state=document.createElement("p");state.className="status";state.textContent="Посилання успішно перевірено";result.append(state)}catch(e){result.textContent=e.message}finally{btn.disabled=false;btn.textContent="Перевірити відео"}});
+$("inspect").addEventListener("click",async()=>{const url=$("url").value.trim();if(!url){result.style.display="block";result.textContent="Спочатку встав посилання на відео.";return}
+const btn=$("inspect");btn.disabled=true;btn.textContent="Перевіряю…";result.style.display="block";result.textContent="Перевіряю посилання…";
+try{const r=await fetch("/api/inspect",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});const d=await r.json();if(!r.ok)throw Error(d.detail||"Помилка перевірки");result.innerHTML="";const title=document.createElement("b");title.textContent=d.title||"Відео знайдено";const author=document.createElement("p");author.textContent="Канал: "+(d.author||"невідомо");const img=document.createElement("img");img.src=d.thumbnail;img.alt="Мініатюра відео";result.append(title,author,img);const state=document.createElement("p");state.className="status";state.textContent="Посилання розпізнано";result.append(state)}catch(e){result.textContent=e.message}finally{btn.disabled=false;btn.textContent="Перевірити відео"}});
 </script></body></html>
