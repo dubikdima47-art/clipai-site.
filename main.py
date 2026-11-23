@@ -23,6 +23,78 @@ class JobRequest(BaseModel):
     clips: int = 10
     duration: int = 45
 
+WAYIN_API_BASE = "https://wayinvideo-api.wayin.ai/api/v2"
+
+@app.post("/api/youtube/jobs")
+async def create_youtube_job(data: JobRequest):
+    api_key = os.getenv("WAYINVIDEO_API_KEY")
+    if not api_key:
+        raise HTTPException(503, "Потрібно додати WAYINVIDEO_API_KEY у Render → Environment.")
+    url = str(data.url)
+    video_id = youtube_id(url)
+    if not video_id or len(video_id) != 11:
+        raise HTTPException(400, "Встав посилання саме на одне YouTube-відео.")
+    if not 1 <= data.clips <= 10 or not 30 <= data.duration <= 60:
+        raise HTTPException(400, "Кількість кліпів: 1–10; тривалість: 30–60 секунд.")
+    payload = {
+        "video_url": f"https://www.youtube.com/watch?v={video_id}",
+        "project_name": "ClipAI YouTube clips",
+        "target_duration": "DURATION_30_60",
+        "limit": data.clips,
+        "enable_export": True,
+        "resolution": "HD_720",
+        "enable_caption": False,
+        "enable_ai_reframe": True,
+        "ratio": "RATIO_9_16"
+    }
+    headers = {"Authorization": f"Bearer {api_key}", "x-wayinvideo-api-version": "v2"}
+    try:
+        async with httpx.AsyncClient(timeout=60) as client:
+            response = await client.post(f"{WAYIN_API_BASE}/clips", json=payload, headers=headers)
+        if response.status_code >= 400:
+            detail = "Зовнішній AI-сервіс не прийняв завдання."
+            if response.status_code == 403:
+                detail = "API-ключ WayinVideo недійсний або не має доступу."
+            elif response.status_code in (402, 429):
+                detail = "Недостатньо кредитів або перевищено ліміт запитів у WayinVideo."
+            raise HTTPException(response.status_code if response.status_code < 500 else 502, detail)
+        result = response.json().get("data", {})
+        job_id = result.get("id")
+        if not job_id:
+            raise HTTPException(502, "AI-сервіс не повернув номер завдання.")
+        return {"job_id": job_id, "status": result.get("status", "CREATED")}
+    except httpx.HTTPError:
+        raise HTTPException(502, "Не вдалося зв'язатися із сервісом AI-монтажу.")
+
+@app.get("/api/youtube/jobs/{job_id}")
+async def get_youtube_job(job_id: str):
+    api_key = os.getenv("WAYINVIDEO_API_KEY")
+    if not api_key:
+        raise HTTPException(503, "На сервері не налаштовано API-ключ WayinVideo.")
+    if not re.fullmatch(r"[A-Za-z0-9_-]{5,100}", job_id):
+        raise HTTPException(400, "Неправильний номер завдання.")
+    headers = {"Authorization": f"Bearer {api_key}", "x-wayinvideo-api-version": "v2"}
+    try:
+        async with httpx.AsyncClient(timeout=40) as client:
+            response = await client.get(f"{WAYIN_API_BASE}/clips/results/{job_id}", headers=headers)
+        if response.status_code >= 400:
+            raise HTTPException(502, "Не вдалося отримати статус AI-монтажу.")
+        data = response.json().get("data", {})
+        state = str(data.get("status", "ONGOING")).upper()
+        clips = data.get("clips", []) or []
+        if state == "SUCCEEDED":
+            return {"status": "done", "clips": [
+                {"title": item.get("title") or f"Кліп {i+1}", "score": item.get("score"),
+                 "download": item.get("export_link"), "begin_ms": item.get("begin_ms"),
+                 "end_ms": item.get("end_ms")}
+                for i, item in enumerate(clips) if item.get("export_link")
+            ]}
+        if state == "FAILED":
+            return {"status": "error", "error": data.get("error") or "AI-сервіс не зміг обробити це відео."}
+        return {"status": "processing", "progress": None, "clips_ready": len(clips)}
+    except httpx.HTTPError:
+        raise HTTPException(502, "Не вдалося зв'язатися із сервісом AI-монтажу.")
+
 def youtube_id(url: str):
     parsed = urlparse(url)
     host = (parsed.hostname or "").lower()
